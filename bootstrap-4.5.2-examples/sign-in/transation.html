@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        td {
+            border: solid 1px;
+            width: 20%
+        }
+    </style>
+    <script src='//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js'></script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script>
+        function refreash() {
+            $.ajax({
+                type: "get",
+                url: "https://brothertest001.azurewebsites.net/api/Liquer/Select_All_Liquer",
+                success: function (response) {
+                    var myCookie = document.cookie.replace(/(?:(?:^|.*;\s*)User\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+
+                    for (var i = 0; i < response.length; i++) {
+
+                        var tableData = "<tr>" +
+                            "<td id='liquer_Name'>" + response[i].liquer_Name + "</td>" +
+                            "<td id='price'>" + response[i].price + "</td>" +
+                            "<td id='quantity'>" + response[i].quantity + "</td>" +
+                            "<td id='productionYear'>" + response[i].productionYear + "</td>" +
+                            "<td id='introductuon'>" + response[i].introductuon + "</td>" +
+                            `<td><input type ='button' value='購買' onclick="btn_click_buy('${myCookie}', '${response[i].liquer_Name}')"></td>` +
+                            "</tr>";
+                        $("#tbody1").append(tableData);
+
+                    }
+                }
+            });
+        }
+        window.onload = function () {
+            refreash()
+
+        }
+        function btn_click_buy(username, liquer_Name) {
+            let data = [
+                {
+                    "user_Name": username,
+                    "liquer_Name": liquer_Name
+                }
+            ]
+            $.ajax({
+                type: "post",
+                url: "https://brothertest001.azurewebsites.net/api/BuyList/Insert_BuyList",
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (response) {
+                    alert("購買成功");
+                    document.getElementById("tbody1").innerHTML = " ";
+                    refreash();
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <input class="btn btn-lg btn-primary btn-block" type="button" name="mycollection" value="首頁"
+        onclick="location.href='selectfunction.html'" />
+    <input class="btn btn-lg btn-primary btn-block" type="button" name="mycollection" value="購買紀錄"
+        onclick="location.href='transationhs.html'" />
+    <table id="summary-table">
+        <thead>
+            <tr>
+                <td id="Liquer_Name">酒名</td>
+                <td id="Price">NT$</td>
+                <td id="Quantity">庫存</td>
+                <td id="ProductionYear">生產年份</td>
+                <td id="Introductuon">賣家介紹</td>
+            </tr>
+        </thead>
+        <tbody id="tbody1">
+        </tbody>
+    </table>
+
+</body>
+
+</html>
